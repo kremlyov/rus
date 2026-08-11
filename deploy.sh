@@ -52,7 +52,7 @@ if ! git remote get-url origin >/dev/null 2>&1; then
 Создайте пустой публичный репозиторий на github.com (без README и лицензии),
 затем выполните:
 
-    git remote add origin https://github.com/ВАШ_ЛОГИН/russkiy-pitstop.git
+    git remote add origin https://github.com/ВАШ_ЛОГИН/rus.git
     git push -u origin main
 
 После этого включите Pages: Settings → Pages → Source → GitHub Actions.

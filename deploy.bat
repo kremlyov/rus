@@ -47,7 +47,7 @@ if errorlevel 1 (
   echo Удалённый репозиторий ещё не подключён. Коммит сохранён локально.
   echo.
   echo Создайте пустой публичный репозиторий на github.com, затем выполните:
-  echo     git remote add origin https://github.com/ВАШ_ЛОГИН/russkiy-pitstop.git
+  echo     git remote add origin https://github.com/ВАШ_ЛОГИН/rus.git
   echo     git push -u origin main
   echo.
   echo После этого включите Pages: Settings ^> Pages ^> Source ^> GitHub Actions.
