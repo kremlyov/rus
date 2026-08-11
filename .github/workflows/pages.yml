@@ -1,0 +1,52 @@
+name: Сборка и публикация на GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Проверить карточки
+        run: python3 check.py
+
+      - name: Собрать index.html
+        run: python3 build.py
+
+      - name: Убедиться, что index.html в репозитории не отстал
+        run: |
+          if ! git diff --quiet -- index.html; then
+            echo "::warning::index.html в репозитории отличается от собранного."
+            echo "Запустите локально: python3 build.py && git commit -am 'rebuild'"
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

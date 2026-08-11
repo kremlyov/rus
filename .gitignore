@@ -1,0 +1,11 @@
+# служебное
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/
+*.pyc
+
+# редакторы
+.vscode/
+.idea/
+*.swp
