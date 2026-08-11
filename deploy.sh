@@ -16,7 +16,7 @@ die()  { printf '\033[31m%s\033[0m\n' "$1" >&2; exit 1; }
 # --- окружение ---------------------------------------------------------------
 command -v python3 >/dev/null || die "Не найден python3. Установите Python и повторите."
 command -v git     >/dev/null || die "Не найден git."
-command -v node    >/dev/null || warn "Не найден node — проверка карточек будет пропущена."
+command -v node    >/dev/null || warn "Не найден node — проверка карточек локально пропускается (её всё равно прогонит GitHub Actions). Поставить: brew install node"
 
 # --- 1. проверка -------------------------------------------------------------
 if command -v node >/dev/null; then
@@ -33,15 +33,14 @@ python3 build.py
 # --- 3. коммит ---------------------------------------------------------------
 say "3/4 Коммит"
 if [ -z "$(git status --porcelain)" ]; then
-  ok "Изменений нет — коммитить нечего."
-  exit 0
+  ok "Новых изменений нет."
+else
+  git status --short
+  MSG="${1:-Обновление тренажёра $(date '+%d.%m.%Y %H:%M')}"
+  git add -A
+  git commit -q -m "$MSG"
+  ok "Закоммичено: $MSG"
 fi
-
-git status --short
-MSG="${1:-Обновление тренажёра $(date '+%d.%m.%Y %H:%M')}"
-git add -A
-git commit -q -m "$MSG"
-ok "Закоммичено: $MSG"
 
 # --- 4. пуш ------------------------------------------------------------------
 say "4/4 Отправляю на GitHub"
@@ -63,6 +62,12 @@ fi
 
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 if git rev-parse --abbrev-ref "@{upstream}" >/dev/null 2>&1; then
+  AHEAD="$(git rev-list --count "@{upstream}"..HEAD)"
+  if [ "$AHEAD" -eq 0 ]; then
+    ok "На GitHub уже всё актуально — отправлять нечего."
+    exit 0
+  fi
+  echo "Коммитов к отправке: $AHEAD"
   git push
 else
   git push -u origin "$BRANCH"
